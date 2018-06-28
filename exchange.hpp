@@ -24,6 +24,9 @@ namespace simple_decentralized_exchange {
       void cancel_bid(account_name maker, int64_t id);
       void calcel_ask(account_name maker, int64_t id);
 
+      void add_currency(account_name contract);
+      void remove_currency(account_name contract);
+
     private:
       struct order {
         int64_t id;
@@ -33,7 +36,14 @@ namespace simple_decentralized_exchange {
         int64_t primary_key()const { return id; }
       };
 
+      struct currency {
+        account_name contract;
+        int64_t primary_key()const {return contract;}
+      }
+
       typedef multi_index<N(bids), order> bids;
       typedef multi_index<N(asks), order> asks;
+
+      typedef multi_index<N(currencies), currency> currencies;
   }
 }

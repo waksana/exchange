@@ -9,6 +9,59 @@
 using namespace eosio;
 
 namespace simple_decentralized_exchange {
+  //buy
+  void exchange::bid(account_name maker, extended_asset quantity, int64_t price) {
+    //充值eos
+    deposit(maker, exchange_to_eos(quantity, price));
+
+    //查找对手
+    asks ask_orders(_self, quantity.contract);
+    order ask_order = find_ask(ask_orders, quantity, price);
+
+    if(ask_order == ask_orders.end()) {
+      add_bid(maker, quantity, price);
+    }
+    else {
+      auto exchange_quantity = asset_min(ask_order.quantity, quantity);
+
+      auto eos_exchange_quantity = exchange_to_eos(exchange_quantity, price);
+
+      withdraw(maker, exchange_quantity);
+      withdraw(ask_order.maker, eos_exchange_quantity);
+
+      auto left = quantity - exchange_quantity;
+
+      sub_ask(ask_order, exchange_quantity);
+
+      add_bid(maker, left, price);
+    }
+  }
+
+  void exchange::ask(account_name maker, extended_asset quantity, int64_t price) {
+    deposit(maker, quantity);
+
+    bids bid_orders(_self, quantity.contract);
+    order bid_order = find_bid(bid_orders, quantity, price);
+
+    if(bid_order == bid_orders.end()) {
+      add_ask(maker, quantity, price);
+    }
+    else {
+      auto exchange_quantity = asset_min(bid_order.quantity, quantity);
+
+      auto eos_exchange_quantity = exchange_to_eos(exchange_quantity, price);
+
+      withdraw(maker, eos_exchange_quantity);
+      withdraw(ask_order.maker, exchange_quantity);
+
+      auto left = quantity - exchange_quantity;
+
+      sub_bid(bid_order, exchange_quantity);
+
+      add_ask(maker, left, price);
+    }
+  }
+
   void exchange::deposit(account_name from, extended_asset quantity) {
 
     require_auth(from);
