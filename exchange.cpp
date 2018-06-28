@@ -9,7 +9,7 @@
 using namespace eosio;
 
 namespace simple_decentralized_exchange {
-  void exchange::deposit(account_name from, account_name contract, asset quantity) {
+  void exchange::deposit(account_name from, extended_asset quantity) {
 
     require_auth(from);
 
@@ -52,4 +52,4 @@ namespace simple_decentralized_exchange {
   }
 }
 
-EOSIO_ABI(simple_decentralized_exchange::exchange, (deposit)(withdrawal)(bid)(ask))
+EOSIO_ABI(simple_decentralized_exchange::exchange, (bid)(ask))

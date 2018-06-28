@@ -18,29 +18,22 @@ namespace simple_decentralized_exchange {
     public:
       exchange(account_name self):contract(self){}
 
-      void deposit(account_name from, asset quantity);
-      void withdrawal(account_name to, asset quantity);
+      void bid(account_name maker, extended_asset quantity, int64_t price);
+      void ask(account_name maker, extended_asset quantity, int64_t price);
 
-      void bid(asset quantity, int64_t price);
-      void ask(asset quantity, int64_t price);
+      void cancel_bid(account_name maker, int64_t id);
+      void calcel_ask(account_name maker, int64_t id);
+
     private:
-      struct account {
-        asset balance;
-        asset on_order;
-        uint64_t primary_key()const { return balance.symbol.name(); }
-      };
       struct order {
-        asset amount;
-        int64_t price;
+        int64_t id;
         account_name maker;
-        uint64_t primary_key()const { return amount.symbol.name(); }
+        asset quantity;
+        int64_t price;
+        int64_t primary_key()const { return id; }
       };
 
-      typedef multi_index<N(accounts), account> accounts;
       typedef multi_index<N(bids), order> bids;
       typedef multi_index<N(asks), order> asks;
-
-     void add_balance( account_name owner, asset value, account_name ram_payer );
-     void sub_balance( account_name owner, asset value );
   }
 }
