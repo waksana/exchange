@@ -12,54 +12,55 @@ namespace simple_decentralized_exchange {
   //buy
   void exchange::bid(account_name maker, extended_asset quantity, int64_t price) {
     //充值eos
-    deposit(maker, exchange_to_eos(quantity, price));
+    deposit(maker, ceil(exchange_to_eos(quantity, price)));
 
     //查找对手
     asks ask_orders(_self, quantity.contract);
+    //查找所有卖价低于price的卖方按照价格时间排序
     order ask_order = find_ask(ask_orders, quantity, price);
 
-    if(ask_order == ask_orders.end()) {
-      add_bid(maker, quantity, price);
-    }
-    else {
+    auto left = quantity;
+
+    while(left.amount > 0 && ask_order != ask_orders.end()) {
       auto exchange_quantity = asset_min(ask_order.quantity, quantity);
 
-      auto eos_exchange_quantity = exchange_to_eos(exchange_quantity, price);
+      auto eos_exchange_quantity = exchange_to_eos(exchange_quantity, ask_order.price);
 
       withdraw(maker, exchange_quantity);
-      withdraw(ask_order.maker, eos_exchange_quantity);
+      withdraw(ask_order.maker, floor(eos_exchange_quantity));
 
-      auto left = quantity - exchange_quantity;
+      left = quantity - exchange_quantity;
 
       sub_ask(ask_order, exchange_quantity);
 
-      add_bid(maker, left, price);
+      //迭代
+      ask_order = ask_order.next();
     }
+    add_bid(maker, left, price);
   }
 
   void exchange::ask(account_name maker, extended_asset quantity, int64_t price) {
+
     deposit(maker, quantity);
 
     bids bid_orders(_self, quantity.contract);
+    //查找所有买价高于price的买方
     order bid_order = find_bid(bid_orders, quantity, price);
 
-    if(bid_order == bid_orders.end()) {
-      add_ask(maker, quantity, price);
-    }
-    else {
-      auto exchange_quantity = asset_min(bid_order.quantity, quantity);
+    auto left = quantity;
 
+    while(left.amount > 0 && bid_order != bid_orders.end()) {
+      auto exchange_quantity = asset_min(bid_order.quantity, quantity);
       auto eos_exchange_quantity = exchange_to_eos(exchange_quantity, price);
 
-      withdraw(maker, eos_exchange_quantity);
-      withdraw(ask_order.maker, exchange_quantity);
+      withdraw(maker, floor(eos_exchange_quantity));
+      withdraw(bid_order.maker, exchange_quantity);
 
-      auto left = quantity - exchange_quantity;
+      left = quantity - exchange_quantity;
 
       sub_bid(bid_order, exchange_quantity);
-
-      add_ask(maker, left, price);
     }
+    add_ask(maker, quantity, price);
   }
 
   void exchange::deposit(account_name from, extended_asset quantity) {
@@ -79,6 +80,7 @@ namespace simple_decentralized_exchange {
     add_balance(from, quantity, from);
 
   }
+
   void exchange::add_balance(account_name owner, asset value, account_name ram_payer) {
     accounts to_acnts(_self, owner);
     auto to = to_acnts.find(value.symbol.name());
