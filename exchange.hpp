@@ -6,44 +6,31 @@
 
 #pragma once
 
-#include <string>
-
-#include <eosiolib/asset.hpp>
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/asset.hpp>
 
 using namespace eosio;
 
-namespace simple_decentralized_exchange {
-  class exchange : public contract {
-    public:
-      exchange(account_name self):contract(self){}
+class exchange : public contract {
+  public:
+    using contract::contract;
+    //@abi action
+    void test(account_name maker, asset quantity, uint128_t price);
+  private:
+    //@abi table
+    struct order {
+      uint64_t id;
+      uint128_t price;
+      asset quantity;
+      account_name maker;
+      uint64_t primary_key() const { return id; }
+      uint128_t get_price() const { return price; }
+      EOSLIB_SERIALIZE(order, (id)(price)(maker)(quantity))
+    };
 
-      void bid(account_name maker, extended_asset quantity, int64_t price);
-      void ask(account_name maker, extended_asset quantity, int64_t price);
+    typedef multi_index<N(orders), order,
+            indexed_by<N(byprice), const_mem_fun<order, uint128_t, &order::get_price> >
+              > order_index;
 
-      void cancel_bid(account_name maker, int64_t id);
-      void calcel_ask(account_name maker, int64_t id);
-
-      void add_currency(account_name contract);
-      void remove_currency(account_name contract);
-
-    private:
-      struct order {
-        int64_t id;
-        account_name maker;
-        asset quantity;
-        int64_t price;
-        int64_t primary_key()const { return id; }
-      };
-
-      struct currency {
-        account_name contract;
-        int64_t primary_key()const {return contract;}
-      }
-
-      typedef multi_index<N(bids), order> bids;
-      typedef multi_index<N(asks), order> asks;
-
-      typedef multi_index<N(currencies), currency> currencies;
-  }
-}
+    void add_order(order_index* orders, account_name maker, asset quantity, uint128_t price);
+};
