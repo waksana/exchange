@@ -1,7 +1,11 @@
 compile: abi wast
-abi:
-	eosiocpp -g exchange.abi exchange.hpp
-wast:
-	eosiocpp -o exchange.wast exchange.cpp
+abi: dest
+	eosiocpp -g dest/dest.abi src/exchange.hpp
+wast: dest
+	eosiocpp -o dest/dest.wast src/exchange.cpp
 clean:
-	rm exchange.abi exchange.was*
+	rm -rf dest
+dest:
+	mkdir dest
+deploy: compile
+	cleos set contract ${account} dest/

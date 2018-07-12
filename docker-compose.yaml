@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  nodeosd:
+    image: eosio/eos-dev:v1.0.8
+    command: nodeos -e -p eosio
+    hostname: nodeosd
+    volumes:
+      - .:/work
+      - ./nodeos:/root/.local/share/eosio/nodeos
+      - ./wallet:/root/eosio-wallet
