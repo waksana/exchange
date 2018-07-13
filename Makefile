@@ -1,3 +1,5 @@
+deploy: compile
+	cleos set contract exchange dest/
 compile: abi wast
 abi: dest
 	eosiocpp -g dest/dest.abi src/exchange.hpp
@@ -7,5 +9,3 @@ clean:
 	rm -rf dest
 dest:
 	mkdir dest
-deploy: compile
-	cleos set contract ${account} dest/
