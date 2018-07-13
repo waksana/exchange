@@ -17,15 +17,22 @@ class exchange : public contract {
     using contract::contract;
 
     //@abi action
+    void ggg(account_name maker, asset quantity, uint64_t price);
+    //@abi action
+    void cleardb();
+
+    //@abi action
     void bid(account_name maker, asset quantity, uint64_t price);
 
     //@abi action
     void ask(account_name maker, asset quantity, uint64_t price);
 
     //token contract is not eosio.token it is the op
-    account_name token_contract = N(eosio.token);
-    symbol_type token_symbol = string_to_symbol(4, "SYS");
-    symbol_type eos_symbol = string_to_symbol(4, "EOS");
+    account_name settlement_token_contract = N(eosio.token);
+    symbol_type settlement_token_symbol = string_to_symbol(3, "EOS");
+
+    account_name exchange_token_contract = N(eosio.token);
+    symbol_type exchange_token_symbol = string_to_symbol(6, "SYS");
 
   private:
     //@abi table
@@ -48,6 +55,6 @@ class exchange : public contract {
     void deposit(account_name contract, account_name user, asset quantity);
     void withdraw(account_name contract, account_name user, asset quantity);
 
-    asset to_eos(asset quantity, uint64_t price, bool floor);
+    asset to_settlement_token(asset quantity, uint64_t price, bool floor);
     asset asset_min(asset a, asset b);
 };
