@@ -29,10 +29,10 @@ class exchange : public contract {
 
     //token contract is not eosio.token it is the op
     account_name settlement_token_contract = N(eosio.token);
-    symbol_type settlement_token_symbol = string_to_symbol(3, "EOS");
+    symbol_type settlement_token_symbol = S(4, EOS);
 
     account_name exchange_token_contract = N(eosio.token);
-    symbol_type exchange_token_symbol = string_to_symbol(6, "SYS");
+    symbol_type exchange_token_symbol = S(3, SYS);
 
   private:
     //@abi table

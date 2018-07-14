@@ -2,7 +2,7 @@ version: "3"
 
 services:
   nodeosd:
-    image: eosio/eos-dev:v1.0.8
+    image: eosio/eos-dev
     command: nodeos
     hostname: nodeosd
     volumes:

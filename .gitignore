@@ -35,5 +35,6 @@
 *.wast
 *.wasm
 dest
-wallet
+wallet/*
+!wallet/config.ini
 data
