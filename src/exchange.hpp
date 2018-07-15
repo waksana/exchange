@@ -43,7 +43,7 @@ class exchange : public contract {
       account_name maker;
       uint64_t primary_key() const { return id; }
       uint64_t get_price() const { return price; }
-      EOSLIB_SERIALIZE(orders, (id)(price)(maker)(quantity))
+      EOSLIB_SERIALIZE(orders, (id)(price)(quantity)(maker))
     };
 
     typedef multi_index<N(orders), orders,
@@ -54,6 +54,7 @@ class exchange : public contract {
 
     void deposit(account_name contract, account_name user, asset quantity);
     void withdraw(account_name contract, account_name user, asset quantity);
+    void transfer(account_name contract, account_name from, account_name to, asset quantity);
 
     asset to_settlement_token(asset quantity, uint64_t price, bool floor);
     asset asset_min(asset a, asset b);
