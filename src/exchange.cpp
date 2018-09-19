@@ -8,24 +8,6 @@
 
 using namespace eosio;
 
-void exchange::cleardb() {
-  order_index askdb(_self, N(ask));
-  order_index biddb(_self, N(bid));
-  for(auto it = askdb.begin(); it != askdb.end(); it = askdb.erase(it)) {
-    print("clear ask, maker: ", name{it->maker}, " quantity: ", it->quantity, " price: ", asset(it->price, settlement_token_symbol), "\n");
-  }
-  for(auto it = biddb.begin(); it != biddb.end(); it = biddb.erase(it)) {
-    print("clear bid, maker: ", name{it->maker}, " quantity: ", it->quantity, " price: ", asset(it->price, settlement_token_symbol), "\n");
-  }
-}
-
-void exchange::ggg(account_name maker, asset quantity, uint64_t price) {
-  //print("hello ", name{maker});
-  //print("bid: ", N(bid), " ask: ", N(ask));
-
-  add_order(N(ask), maker, quantity, price);
-}
-
 void exchange::add_order(uint64_t scope, account_name maker, asset quantity, uint64_t price) {
   order_index orders(_self, scope);
   print("add order, maker: ", name{maker}, " quantity: ", quantity, " price: ", asset(price, settlement_token_symbol), "\n");

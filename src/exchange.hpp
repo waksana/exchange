@@ -17,11 +17,6 @@ class exchange : public contract {
     using contract::contract;
 
     //@abi action
-    void ggg(account_name maker, asset quantity, uint64_t price);
-    //@abi action
-    void cleardb();
-
-    //@abi action
     void bid(account_name maker, asset quantity, uint64_t price);
 
     //@abi action
